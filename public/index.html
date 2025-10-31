@@ -1,43 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Practicals Code (Assignments 1-8)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .practical {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        pre {
+            background-color: #272822; /* Dark background for code */
+            color: #f8f8f2; /* Light text color */
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            line-height: 1.4;
+            tab-size: 4;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <h1>Cryptography Practicals Code (Assignments 1-8)</h1>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <div class="practical">
+        <h2>Assignment 01 - Perform encryption and decryption using Caesar cipher Algorithm.</h2>
+        <pre><code>public class CaesarCipher {
+public static String encrypt(String plaintext, int shiftKey) {
+StringBuilder ciphertext = new StringBuilder();
+int normalizedKey = shiftKey % 26;
+for (int i = 0; i < plaintext.length(); i++) {
+char charToEncrypt = plaintext.charAt(i);
+if (charToEncrypt >= 'A' && charToEncrypt <= 'Z') {
+char encryptedChar = (char) ('A' + (charToEncrypt - 'A'
++ normalizedKey) % 26);
+ciphertext.append(encryptedChar);
+} else if (charToEncrypt >= 'a' && charToEncrypt <= 'z') {
+char encryptedChar = (char) ('a' + (charToEncrypt - 'a'
++ normalizedKey) % 26);
+ciphertext.append(encryptedChar);
+} else {
+ciphertext.append(charToEncrypt);
+}
+}
+return ciphertext.toString();
+}
+public static String decrypt(String ciphertext, int shiftKey) {
+int decryptionKey = (26 - (shiftKey % 26)) % 26;
+return encrypt(ciphertext, decryptionKey);
+}
+public static void main(String[] args) {
+String originalMessage = "The quick brown fox jumps over the
+lazy dog.";
+int key = 7; // The shift value
+System.out.println("--- Caesar Cipher Demonstration ---");
+System.out.println("Original Message: " + originalMessage);
+System.out.println("Shift Key: " + key);
+// 1. Encryption
+String encryptedMessage = encrypt(originalMessage, key);
+System.out.println("\nEncrypted Message (Ciphertext): " +
+encryptedMessage);
+// 2. Decryption
+String decryptedMessage = decrypt(encryptedMessage, key);
+System.out.println("Decrypted Message (Plaintext): " +
+decryptedMessage);
+int largeKey = 27;
+String largeKeyEncrypted = encrypt("Test", largeKey);
+System.out.println("\nExample with large key (" + largeKey + ",
+normalized to 1):");
+System.out.println("Encrypted 'Test' with large key: " +
+largeKeyEncrypted);
+String largeKeyDecrypted = decrypt(largeKeyEncrypted, largeKey);
+System.out.println("Decrypted back: " + largeKeyDecrypted);
+}
+}</code></pre>
+    </div>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    <div class="practical">
+        <h2>Assignment 02 - Perform encryption and decryption using Playfair cipher Algorithm.</h2>
+        <pre><code>public class PlayfairCipher {
+private char[][] keyMatrix = new char[5][5];
+private String key = "MONARCHY";
+private void createPlayfairMatrix() {
+String keyUpper = key.toUpperCase().replaceAll("[^A-Z]",
+"").replace('J', 'I');
+String alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
+StringBuilder uniqueKey = new StringBuilder();
+for (int i = 0; i < keyUpper.length(); i++) {
+char c = keyUpper.charAt(i);
+if (uniqueKey.indexOf(String.valueOf(c)) == -1) {
+uniqueKey.append(c);
+}
+}
+for (int i = 0; i < alphabet.length(); i++) {
+char c = alphabet.charAt(i);
+if (uniqueKey.indexOf(String.valueOf(c)) == -1) {
+uniqueKey.append(c);
+}
+}
+for (int i = 0; i < 25; i++) {
+keyMatrix[i / 5][i % 5] = uniqueKey.charAt(i);
+}
+}
+private int[] getCharLocation(char c) {
+int[] location = new int[2];
+for (int i = 0; i < 5; i++) {
+for (int j = 0; j < 5; j++) {
+if (keyMatrix[i][j] == c) {
+location[0] = i;
+location[1] = j;
+return location;
+}
+}
+}
+return location;
+}
+private String preparePlaintext(String plaintext) {
+String cleanText = plaintext.toUpperCase().replaceAll("[^A-Z]",
+"").replace('J', 'I');
+StringBuilder preparedText = new StringBuilder();
+for (int i = 0; i < cleanText.length(); i++) {
+preparedText.append(cleanText.charAt(i));
+if (i < cleanText.length() - 1) {
+if (cleanText.charAt(i) == cleanText.charAt(i + 1)) {
+preparedText.append('X');
+}
+}
+}
+if (preparedText.length() % 2 != 0) {
+preparedText.append('X');
+}
+return preparedText.toString();
+}
+public PlayfairCipher(String key) {
+this.key = key;
+createPlayfairMatrix();
+}
+public String encrypt(String plaintext) {
+String preparedText = preparePlaintext(plaintext);
+StringBuilder ciphertext = new StringBuilder();
+for (int i = 0; i < preparedText.length(); i += 2) {
+char c1 = preparedText.charAt(i);
+char c2 = preparedText.charAt(i + 1);
+int[] loc1 = getCharLocation(c1);
+int[] loc2 = getCharLocation(c2);
+int r1 = loc1[0], cA = loc1[1];
+int r2 = loc2[0], cB = loc2[1];
+if (r1 == r2) {
+ciphertext.append(keyMatrix[r1][(cA + 1) % 5]);
+ciphertext.append(keyMatrix[r2][(cB + 1) % 5]);
+} else if (cA == cB) {
+ciphertext.append(keyMatrix[(r1 + 1) % 5][cA]);
+ciphertext.append(keyMatrix[(r2 + 1) % 5][cB]);
+} else {
+ciphertext.append(keyMatrix[r1][cB]);
+ciphertext.append(keyMatrix[r2][cA]);
+}
+}
+return ciphertext.toString();
+}
+public String decrypt(String ciphertext) {
+StringBuilder plaintext = new StringBuilder();
+for (int i = 0; i < ciphertext.length(); i += 2) {
+char c1 = ciphertext.charAt(i);
+char c2 = ciphertext.charAt(i + 1);
+int[] loc1 = getCharLocation(c1);
+int[] loc2 = getCharLocation(c2);
+int r1 = loc1[0], cA = loc1[1];
+int r2 = loc2[0], cB = loc2[1];
+if (r1 == r2) {
+plaintext.append(keyMatrix[r1][(cA + 4) % 5]);
+plaintext.append(keyMatrix[r2][(cB + 4) % 5]);
+} else if (cA == cB) {
+plaintext.append(keyMatrix[(r1 + 4) % 5][cA]);
+plaintext.append(keyMatrix[(r2 + 4) % 5][cB]);
+} else {
+plaintext.append(keyMatrix[r1][cB]);
+plaintext.append(keyMatrix[r2][cA]);
+}
+}
+return plaintext.toString();
+}
+public static void main(String[] args) {
+String key = "EXAMPLEKEY";
+String message = "Hide the gold in the tree stump";
+PlayfairCipher cipher = new PlayfairCipher(key);
+System.out.println("--- Playfair Cipher Demonstration ---");
+System.out.println("Key: " + key);
+System.out.println("Original Message: " + message);
+String encrypted = cipher.encrypt(message);
+System.out.println("Encrypted Message: " + encrypted);
+String decrypted = cipher.decrypt(encrypted);
+System.out.println("Decrypted Message (with 'X' padding): " +
+decrypted);
+System.out.println("\nPlayfair Key Matrix:");
+for (int i = 0; i < 5; i++) {
+for (int j = 0; j < 5; j++) {
+System.out.print(cipher.keyMatrix[i][j] + " ");
+}
+System.out.println();
+}
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 03 - Perform encryption and decryption using Rail Fence Technique. (Row Transposition Techniques)</h2>
+        <pre><code>public class RailFenceCipher {
+private static String cleanText(String text) {
+return text.toUpperCase().replaceAll("[^A-Z]", "");
+}
+public static String encrypt(String plaintext, int rails) {
+String cleanPlaintext = cleanText(plaintext);
+int len = cleanPlaintext.length();
+if (rails <= 1 || len <= rails) {
+return cleanPlaintext;
+}
+char[][] railMatrix = new char[rails][len];
+int row = 0;
+int col = 0;
+boolean down = true;
+for (int i = 0; i < len; i++) {
+railMatrix[row][col++] = cleanPlaintext.charAt(i);
+if (down) {
+row++;
+} else {
+row--;
+}
+if (row == rails) {
+down = false;
+row = rails - 2;
+}
+if (row < 0) {
+down = true;
+row = 1;
+}
+}
+StringBuilder ciphertext = new StringBuilder();
+for (int i = 0; i < rails; i++) {
+for (int j = 0; j < len; j++) {
+if (railMatrix[i][j] != 0) {
+ciphertext.append(railMatrix[i][j]);
+}
+}
+}
+return ciphertext.toString();
+}
+public static String decrypt(String ciphertext, int rails) {
+int len = ciphertext.length();
+if (rails <= 1 || len <= rails) {
+return ciphertext;
+}
+char[][] railMatrix = new char[rails][len];
+int row = 0;
+int col = 0;
+boolean down = true;
+for (int i = 0; i < len; i++) {
+railMatrix[row][col++] = '\n';
+if (down) {
+row++;
+} else {
+row--;
+}
+if (row == rails) {
+down = false;
+row = rails - 2;
+}
+if (row < 0) {
+down = true;
+row = 1;
+}
+}
+int charIndex = 0;
+for (int i = 0; i < rails; i++) {
+for (int j = 0; j < len; j++) {
+if (railMatrix[i][j] == '\n') {
+if (charIndex < len) {
+railMatrix[i][j] =
+ciphertext.charAt(charIndex++);
+}
+}
+}
+}
+StringBuilder plaintext = new StringBuilder();
+row = 0;
+col = 0;
+down = true;
+for (int i = 0; i < len; i++) {
+plaintext.append(railMatrix[row][col++]);
+if (down) {
+row++;
+} else {
+row--;
+}
+if (row == rails) {
+down = false;
+row = rails - 2;
+}
+if (row < 0) {
+down = true;
+row = 1;
+}
+}
+return plaintext.toString();
+}
+public static void main(String[] args) {
+String message = "WELCOMETOTHENEXTLEVEL";
+int rails = 3;
+System.out.println("--- Rail Fence Cipher Demonstration ---");
+System.out.println("Original Message: " + message);
+System.out.println("Number of Rails: " + rails);
+String encrypted = encrypt(message, rails);
+System.out.println("Encrypted Message: " + encrypted);
+String decrypted = decrypt(encrypted, rails);
+System.out.println("Decrypted Message: " + decrypted);
+String message2 = "Attack at dawn.";
+int rails2 = 4;
+String encrypted2 = encrypt(message2, rails2);
+System.out.println("\nOriginal Message (cleaned): " +
+cleanText(message2));
+System.out.println("Number of Rails: " + rails2);
+System.out.println("Encrypted Message: " + encrypted2);
+String decrypted2 = decrypt(encrypted2, rails2);
+System.out.println("Decrypted Message: " + decrypted2);
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 04 : Perform encryption and decryption using Columnar Transposition Techniques.</h2>
+        <pre><code>import java.util.Arrays;
+public class ColumnarTranspositionCipher {
+private static class KeyOrder implements Comparable&lt;KeyOrder&gt; {
+char character;
+int originalIndex;
+KeyOrder(char character, int originalIndex) {
+this.character = character;
+this.originalIndex = originalIndex;
+}
+public int compareTo(KeyOrder other) {
+return Character.compare(this.character, other.character);
+}
+}
+private static String cleanText(String text) {
+return text.toUpperCase().replaceAll("[^A-Z]", "");
+}
+private static KeyOrder[] getKeyOrder(String key) {
+int keyLength = key.length();
+KeyOrder[] keyOrders = new KeyOrder[keyLength];
+for (int i = 0; i < keyLength; i++) {
+keyOrders[i] = new KeyOrder(key.charAt(i), i);
+}
+Arrays.sort(keyOrders);
+return keyOrders;
+}
+public static String encrypt(String plaintext, String key) {
+String cleanPlaintext = cleanText(plaintext);
+String cleanKey = cleanText(key);
+int keyLength = cleanKey.length();
+int len = cleanPlaintext.length();
+KeyOrder[] keyOrders = getKeyOrder(cleanKey);
+int rows = (int) Math.ceil((double) len / keyLength);
+char[][] matrix = new char[rows][keyLength];
+int charIndex = 0;
+for (int r = 0; r < rows; r++) {
+for (int c = 0; c < keyLength; c++) {
+if (charIndex < len) {
+matrix[r][c] = cleanPlaintext.charAt(charIndex++);
+} else {
+matrix[r][c] = 'X';
+}
+}
+}
+StringBuilder ciphertext = new StringBuilder();
+for (int i = 0; i < keyLength; i++) {
+int col = keyOrders[i].originalIndex;
+for (int r = 0; r < rows; r++) {
+ciphertext.append(matrix[r][col]);
+}
+}
+return ciphertext.toString();
+}
+public static String decrypt(String ciphertext, String key) {
+String cleanCiphertext = cleanText(ciphertext);
+String cleanKey = cleanText(key);
+int keyLength = cleanKey.length();
+int len = cleanCiphertext.length();
+KeyOrder[] keyOrders = getKeyOrder(cleanKey);
+int rows = (int) Math.ceil((double) len / keyLength);
+int fullCols = len % keyLength;
+if (fullCols == 0) fullCols = keyLength;
+char[][] matrix = new char[rows][keyLength];
+int charIndex = 0;
+for (int i = 0; i < keyLength; i++) {
+int originalCol = keyOrders[i].originalIndex;
+int colLen = rows;
+// If this column is one of the 'short' columns (which would have
+// the padding 'X' at the bottom in the last row)
+if (len % keyLength != 0 && originalCol >= (len %
+keyLength)) {
+colLen = rows - 1;
+}
+for (int r = 0; r < colLen; r++) {
+matrix[r][originalCol] =
+cleanCiphertext.charAt(charIndex++);
+}
+}
+StringBuilder plaintext = new StringBuilder();
+for (int r = 0; r < rows; r++) {
+for (int c = 0; c < keyLength; c++) {
+if (r * keyLength + c < len) {
+plaintext.append(matrix[r][c]);
+}
+}
+}
+return plaintext.toString();
+}
+public static void main(String[] args) {
+String key = "HACK";
+String message = "TRANSPORTATION";
+System.out.println("--- Columnar Transposition Cipher
+Demonstration ---");
+System.out.println("Key: " + key.toUpperCase());
+System.out.println("Original Message: " +
+message.toUpperCase());
+String encrypted = encrypt(message, key);
+System.out.println("Encrypted Message: " + encrypted);
+String decrypted = decrypt(encrypted, key);
+System.out.println("Decrypted Message: " + decrypted);
+String message2 = "SECURITY IS A TRAP";
+String key2 = "ZEBRAS";
+System.out.println("\n--- Second Example ---");
+System.out.println("Key: " + key2.toUpperCase());
+System.out.println("Original Message (cleaned): " +
+cleanText(message2));
+String encrypted2 = encrypt(message2, key2);
+System.out.println("Encrypted Message: " + encrypted2);
+String decrypted2 = decrypt(encrypted2, key2);
+System.out.println("Decrypted Message: " + decrypted2);
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 05 : Perform encryption and decryption using One Time Pad Algorithm (Corrected)</h2>
+        <pre><code>public class OneTimePadCipher {
+private static String cleanText(String text) {
+return text.toUpperCase().replaceAll("[^A-Z]", "");
+}
+private static String validateAndPrepare(String plaintext, String
+key) {
+String cleanPlaintext = cleanText(plaintext);
+String cleanKey = cleanText(key);
+if (cleanPlaintext.length() != cleanKey.length()) {
+throw new IllegalArgumentException("Error: Plaintext and Key
+must be the same length after removing spaces and punctuation.");
+}
+return cleanPlaintext;
+}
+public static String encrypt(String plaintext, String key) {
+String cleanPlaintext = validateAndPrepare(plaintext, key);
+String cleanKey = cleanText(key);
+StringBuilder ciphertext = new StringBuilder();
+for (int i = 0; i < cleanPlaintext.length(); i++) {
+char p = cleanPlaintext.charAt(i);
+char k = cleanKey.charAt(i);
+// Convert character to 0-25 index, add key index, and take
+// modulo 26
+int encryptedIndex = (p - 'A' + (k - 'A')) % 26;
+// Convert back to uppercase character
+char encryptedChar = (char) ('A' + encryptedIndex);
+ciphertext.append(encryptedChar);
+}
+return ciphertext.toString();
+}
+public static String decrypt(String ciphertext, String key) {
+String cleanCiphertext = validateAndPrepare(ciphertext, key);
+String cleanKey = cleanText(key);
+StringBuilder plaintext = new StringBuilder();
+for (int i = 0; i < cleanCiphertext.length(); i++) {
+char c = cleanCiphertext.charAt(i);
+char k = cleanKey.charAt(i);
+// Convert character to 0-25 index, subtract key index, add
+// 26 (for negative results), and take modulo 26
+int decryptedIndex = (c - 'A' - (k - 'A') + 26) % 26;
+// Convert back to uppercase character
+char decryptedChar = (char) ('A' + decryptedIndex);
+plaintext.append(decryptedChar);
+}
+return plaintext.toString();
+}
+public static void main(String[] args) {
+// NOTE: In a real OTP, the key would be random and used only
+// once.
+String message = "SENDHELP";
+String key = "XMCKLGKR"; // Key must be the same length as the
+// message
+System.out.println("--- One-Time Pad Cipher Demonstration ---");
+System.out.println("Original Message (Plaintext): " + message);
+System.out.println("One-Time Pad Key: " + key);
+try {
+// 1. Encryption
+String encryptedMessage = encrypt(message, key);
+System.out.println("\nEncrypted Message (Ciphertext): " +
+encryptedMessage); // Example Output: FZSKNPNR
+// 2. Decryption
+String decryptedMessage = decrypt(encryptedMessage, key);
+System.out.println("Decrypted Message (Plaintext): " +
+decryptedMessage); // Should be SENDHELP
+// 3. Example of length mismatch (will throw an error)
+String shortKey = "SHORT";
+System.out.println("\nTesting with length mismatch (should
+fail):");
+try {
+encrypt(message, shortKey);
+} catch (IllegalArgumentException e) {
+System.out.println("Error Handled: " + e.getMessage());
+}
+} catch (IllegalArgumentException e) {
+System.err.println("A critical error occurred: " +
+e.getMessage());
+}
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 06 : Write a program to Develop a Secure System by Applying RSA Cryptography Algorithms.</h2>
+        <pre><code>import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Random;
+public class RSA {
+private BigInteger p;
+private BigInteger q;
+private BigInteger n;
+private BigInteger phi;
+private BigInteger e;
+private BigInteger d;
+private int bitLength = 1024;
+private Random random;
+public RSA() {
+random = new SecureRandom();
+p = BigInteger.probablePrime(bitLength / 2, random);
+q = BigInteger.probablePrime(bitLength / 2, random);
+while (p.equals(q)) {
+q = BigInteger.probablePrime(bitLength / 2, random);
+}
+n = p.multiply(q);
+phi =
+p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+e = new BigInteger("65537");
+if (!e.gcd(phi).equals(BigInteger.ONE)) {
+do {
+e = new BigInteger(bitLength / 2, random);
+} while (e.compareTo(BigInteger.ONE) <= 0 ||
+e.compareTo(phi) >= 0 || !e.gcd(phi).equals(BigInteger.ONE));
+}
+d = e.modInverse(phi);
+}
+public BigInteger encrypt(BigInteger message) {
+return message.modPow(e, n);
+}
+public BigInteger decrypt(BigInteger ciphertext) {
+return ciphertext.modPow(d, n);
+}
+public BigInteger getE() {
+return e;
+}
+public BigInteger getN() {
+return n;
+}
+public BigInteger getD() {
+return d;
+}
+public static void main(String[] args) {
+System.out.println("--- RSA Algorithm Demonstration ---");
+System.out.println("Generating 1024-bit key pair (may take a
+moment)...");
+try {
+RSA rsa = new RSA();
+System.out.println("\n--- Keys Generated ---");
+System.out.println("Public Key (e, n):");
+System.out.println("  e (Exponent): " +
+rsa.getE().toString().substring(0, 10) + "...");
+System.out.println("  n (Modulus):  " +
+rsa.getN().toString().substring(0, 10) + "...");
+System.out.println("\nPrivate Key (d, n):");
+System.out.println("  d (Exponent): " +
+rsa.getD().toString().substring(0, 10) + "...");
+System.out.println("  n (Modulus):  " +
+rsa.getN().toString().substring(0, 10) + "...");
+String originalMessage = "HELLO";
+BigInteger messageBigInt = new
+BigInteger(originalMessage.getBytes());
+System.out.println("\nOriginal Message: " +
+originalMessage);
+System.out.println("Message as BigInteger: " +
+messageBigInt.toString());
+BigInteger encrypted = rsa.encrypt(messageBigInt);
+System.out.println("\nEncrypted Ciphertext (c): " +
+encrypted.toString());
+BigInteger decrypted = rsa.decrypt(encrypted);
+System.out.println("\nDecrypted Plaintext (m): " +
+decrypted.toString());
+String finalDecryptedMessage = new
+String(decrypted.toByteArray());
+System.out.println("Final Decrypted Message: " +
+finalDecryptedMessage);
+} catch (Exception e) {
+System.err.println("An error occurred during RSA operations:
+" + e.getMessage());
+e.printStackTrace();
+}
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 07 : Implement Digital signature algorithm in Java</h2>
+        <pre><code>import java.security.*;
+import java.util.Base64;
+public class DigitalSignature {
+private static final String ALGORITHM = "RSA";
+private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+public static KeyPair generateKeys() throws NoSuchAlgorithmException
+{
+KeyPairGenerator keyGen =
+KeyPairGenerator.getInstance(ALGORITHM);
+keyGen.initialize(2048);
+return keyGen.generateKeyPair();
+}
+public static byte[] signMessage(PrivateKey privateKey, String
+message) throws Exception {
+Signature signature =
+Signature.getInstance(SIGNATURE_ALGORITHM);
+signature.initSign(privateKey);
+signature.update(message.getBytes());
+return signature.sign();
+}
+public static boolean verifySignature(PublicKey publicKey, String
+message, byte[] signatureBytes) throws Exception {
+Signature signature =
+Signature.getInstance(SIGNATURE_ALGORITHM);
+signature.initVerify(publicKey);
+signature.update(message.getBytes());
+return signature.verify(signatureBytes);
+}
+public static void main(String[] args) {
+try {
+System.out.println("--- Digital Signature Demonstration
+(SHA256withRSA) ---");
+// 1. Key Generation
+KeyPair keyPair = generateKeys();
+PrivateKey privateKey = keyPair.getPrivate();
+PublicKey publicKey = keyPair.getPublic();
+System.out.println("\nKeys Generated (2048-bit RSA)");
+// 2. Message
+String originalMessage = "The contract is approved, and the
+amount is $5000.";
+System.out.println("Original Message:\n" + originalMessage);
+// 3. Signing
+byte[] signatureBytes = signMessage(privateKey,
+originalMessage);
+String signatureBase64 =
+Base64.getEncoder().encodeToString(signatureBytes);
+System.out.println("\nGenerated Signature (Base64):\n" +
+signatureBase64.substring(0, 50) + "...");
+// 4. Verification (Successful Case)
+boolean isVerified = verifySignature(publicKey,
+originalMessage, signatureBytes);
+System.out.println("\nVerification Result (Original
+Message): " + isVerified); // Should be true
+// 5. Tampering Attempt (Failing Case)
+String tamperedMessage = "The contract is approved, and the
+amount is $50000."; // Tampered with an extra zero
+boolean isTamperedVerified = verifySignature(publicKey,
+tamperedMessage, signatureBytes);
+System.out.println("Tampered Message:\n" +
+tamperedMessage.substring(0, 55) + "...");
+System.out.println("Verification Result (Tampered Message):
+" + isTamperedVerified); // Should be false
+} catch (Exception e) {
+System.err.println("An error occurred: " + e.getMessage());
+}
+}
+}</code></pre>
+    </div>
+
+    <div class="practical">
+        <h2>Assignment 08 : Write a program to implement Diffie–Hellman Key Exchange.</h2>
+        <pre><code>import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Random;
+public class DiffieHellman {
+private static final int BIT_LENGTH = 2048;
+private static final Random RANDOM = new SecureRandom();
+public static void main(String[] args) {
+// Publicly Agreed Parameters (P and G)
+BigInteger P = BigInteger.probablePrime(BIT_LENGTH, RANDOM);
+BigInteger G = BigInteger.valueOf(3);
+System.out.println("--- Diffie-Hellman Key Exchange
+Demonstration ---");
+System.out.println("Public Prime Modulus P (truncated): " +
+P.toString().substring(0, 10) + "...");
+System.out.println("Public Base Generator G: " + G);
+// --- Alice's Side ---
+// Alice chooses a private key 'a'
+BigInteger privateKeyA = new BigInteger(BIT_LENGTH - 1, RANDOM);
+// Alice computes public key A = G^a mod P
+BigInteger publicKeyA = G.modPow(privateKeyA, P);
+System.out.println("\n--- Alice's Exchange ---");
+System.out.println("Alice's Private Key (a, truncated): " +
+privateKeyA.toString().substring(0, 10) + "...");
+System.out.println("Alice computes and sends Public Key A
+(truncated): " + publicKeyA.toString().substring(0, 10) + "...");
+// --- Bob's Side ---
+// Bob chooses a private key 'b'
+BigInteger privateKeyB = new BigInteger(BIT_LENGTH - 1, RANDOM);
+// Bob computes public key B = G^b mod P
+BigInteger publicKeyB = G.modPow(privateKeyB, P);
+System.out.println("\n--- Bob's Exchange ---");
+System.out.println("Bob's Private Key (b, truncated): " +
+privateKeyB.toString().substring(0, 10) + "...");
+System.out.println("Bob computes and sends Public Key B
+(truncated): " + publicKeyB.toString().substring(0, 10) + "...");
+// --- Shared Secret Calculation ---
+// Alice computes shared secret S_A = B^a mod P
+BigInteger sharedSecretA = publicKeyB.modPow(privateKeyA, P);
+// Bob computes shared secret S_B = A^b mod P
+BigInteger sharedSecretB = publicKeyA.modPow(privateKeyB, P);
+// Comparison
+System.out.println("\n--- Verification ---");
+System.out.println("Alice's Shared Secret (S_A, truncated): " +
+sharedSecretA.toString().substring(0, 10) + "...");
+System.out.println("Bob's Shared Secret (S_B, truncated): " +
+sharedSecretB.toString().substring(0, 10) + "...");
+boolean match = sharedSecretA.equals(sharedSecretB);
+System.out.println("Do the shared secrets match? " + match);
+}
+}</code></pre>
+    </div>
+
+</body>
 </html>
